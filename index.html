@@ -245,7 +245,7 @@ const DRAFT_KEY="sjs-brand-q-draft", SENT_KEY="sjs-brand-q-sent";
 /* …/#edit: the shared link for changing a questionnaire that was already sent */
 const EDIT=/^#edit\b/.test(location.hash)||new URLSearchParams(location.search).has("edit");
 /* 신청 마감 (11월 11일): new questionnaires are closed; brands that already sent one can still change it at …/#edit */
-const CLOSED=true;
+const CLOSED=true, LATE=false; // the separate late link (apply-….html) is built with CLOSED=false, LATE=true
 let editRow=null; // {id,data} of the brand being edited
 const $=s=>document.querySelector(s);
 const len=s=>[...(s||"")].length;
@@ -435,7 +435,7 @@ $("#qform").addEventListener("submit",async e=>{
       name:v("name"), email:v("email").replace(/\s+/g,"").toLowerCase(), section:sel.value==="unknown"?0:+sel.value, sectionUnsure:sel.value==="unknown",
       hook:tidy($("#q-hook").value), intro:tidy($("#q-intro").value), newyear:tidy($("#q-newyear").value), // line breaks kept: they are the image's line breaks
       photos:uploaded.map(u=>({src:u.src,path:u.path,w:u.w,h:u.h,scale:1,x:0,y:0,rot:0})),
-      fromForm:true, submittedAt:new Date().toISOString(),
+      fromForm:true, submittedAt:new Date().toISOString(), ...(LATE?{late:true}:{}), // late: sent through the separate link after the deadline
     };
     await sb("/rest/v1/brands",{method:"POST",headers:{"content-type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({ord:Date.now(),data})});
     try{ localStorage.removeItem(DRAFT_KEY); localStorage.setItem(SENT_KEY,JSON.stringify({name:data.name,email:data.email,at:data.submittedAt})); }catch(_){}
@@ -544,7 +544,7 @@ function showDone(already, name){
 
 /* always the newest version: browsers may keep this page for up to 10 minutes, so on opening it checks
    version.json past every cache and, if a newer build is up, reloads once at "?v=<build>" (drafts are kept) */
-const BUILD="20261112-153159";
+const BUILD="20261112-170415";
 (async()=>{
   if(!/github\.io$/.test(location.hostname)) return;
   try{
