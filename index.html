@@ -246,7 +246,7 @@ const DRAFT_KEY="sjs-brand-q-draft", SENT_KEY="sjs-brand-q-sent";
 /* …/#edit: the shared link for changing a questionnaire that was already sent */
 const EDIT=/^#edit\b/.test(location.hash)||new URLSearchParams(location.search).has("edit");
 /* 신청 마감 (11월 11일): new questionnaires are closed; brands that already sent one can still change it at …/#edit */
-const CLOSED=true, LATE=false; // the separate late link (apply-….html) is built with CLOSED=false, LATE=true
+const CLOSED=false, LATE=false; // 11/26 다시 열림 (마감하려면 CLOSED=true). The separate late link (apply-….html) is built with LATE=true
 let editRow=null; // {id,data} of the brand being edited
 const $=s=>document.querySelector(s);
 const len=s=>[...(s||"")].length;
@@ -545,7 +545,7 @@ function showDone(already, name){
 
 /* always the newest version: browsers may keep this page for up to 10 minutes, so on opening it checks
    version.json past every cache and, if a newer build is up, reloads once at "?v=<build>" (drafts are kept) */
-const BUILD="20261112-171026";
+const BUILD="20261126-171032";
 (async()=>{
   if(!/github\.io$/.test(location.hostname)) return;
   try{
